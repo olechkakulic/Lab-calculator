@@ -19,10 +19,10 @@ titanic_link = 'https://raw.githubusercontent.com/mwaskom/seaborn-data/master/ti
 titanic_data = load_dataset(titanic_link)
 #ЗАГОЛОВКИ #
 st.title("Калькулятор Брэгговского зеркала")
-st.markdown("Welcome to this in-depth introduction to [...].")
+st.markdown("Люблю Дашеньку Салтыкову")
 #код для вводимых данных
-st.number_input('Длина волны', min_value = 0, max_value = 1000, step = 1)
-st.number_input('Значение угла', min_value = 0, max_value = 180, step = 1)
-st.selectbox(
+st.sidebar.number_input('Длина волны', min_value = 0, max_value = 1000, step = 1)
+st.sidebar.number_input('Значение угла', min_value = 0, max_value = 180, step = 1)
+st.sidebar.selectbox(
      'Тип поляризации',
      ('TE', 'TM',))
