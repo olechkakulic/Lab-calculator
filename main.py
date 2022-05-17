@@ -1,25 +1,23 @@
-import pandas as pd
-import time
+#import time
+#import streamlit as st
 import streamlit as st
-import streamlit as st
 import pandas as pd
-import numpy as np
-from urllib.request import urlopen
-import json
+#import numpy as np
+#from urllib.request import urlopen
+#import json
 import os
-
-from openpyxl import load_workbook
+#from openpyxl import load_workbook
 
 def get_step(material_name, type):
     if type==1:
-        return float(globals()[material_name].iat[0, "wl"])
+        return float(globals()[material_name]['wl'].values[0])
     elif type==2:
-        return float(globals()[material_name]['wl'].iat[-1])
+        return float(globals()[material_name]['wl'].values[-1])
 @st.cache
 def load_dataset(data_link):
     dataset = pd.read_csv(data_link)
     return dataset
-
+# работа с файлами
 directory = 'DataFiles'
 files = os.listdir(directory)
 filenames=[]
@@ -40,20 +38,9 @@ st.sidebar.selectbox(
 material=st.sidebar.selectbox(
      'Материал',
      (filenames))
-
 if material:
     st.sidebar.number_input('Длина волны ', min_value=get_step(str(material), 1), max_value=get_step(str(material), 2))
 
-# # прога ептить пробная попытка запустить файл нахуй.
-# sheet = wb.get_sheet_by_name('Worksheet')
-# # норм попытка для Ag
-# wb = load_workbook("D:\Ag.xlsx")
-# sheet = wb.get_sheet_by_name('Worksheet')
-#b - Длина волны из столбцов
-#def blocks(material,b)
-    #if b != sheet.cell(column=1).value:
-#return **
-# работа с папкой, в которой лежат файлы
 
 
 
