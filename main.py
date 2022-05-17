@@ -8,7 +8,9 @@ import numpy as np
 import plotly.express as px
 from urllib.request import urlopen
 import json
+import os
 
+from openpyxl import load_workbook
 @st.cache
 def load_dataset(data_link):
     dataset = pd.read_csv(data_link)
@@ -26,3 +28,28 @@ st.sidebar.number_input('Значение угла', min_value = 0, max_value = 
 st.sidebar.selectbox(
      'Тип поляризации',
      ('TE', 'TM',))
+material = ['Ag',"Au"]
+st.sidebar.selectbox(
+     'Материал',
+     (material))
+
+
+# прога ептить пробная попытка запустить файл нахуй.
+wb = load_workbook(r"C:\Users\4814285\lab culc\Johnson.xlsx")
+sheet = wb.get_sheet_by_name('Worksheet')
+# норм попытка для Ag
+wb = load_workbook("D:\Ag.xlsx")
+sheet = wb.get_sheet_by_name('Worksheet')
+#b - Длина волны из столбцов
+#def blocks(material,b)
+    #if b != sheet.cell(column=1).value:
+#return **
+# работа с папкой, в которой лежат файлы
+directory = 'D:\материалы'
+files = os.listdir(directory)
+for i in range (len(files)):
+    input(files[i])
+    os.path.splitext(D:\материалы)[0]
+
+
+
