@@ -1,11 +1,9 @@
 import pandas as pd
 import time
 import streamlit as st
-import plotly.express as px
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
 from urllib.request import urlopen
 import json
 import os
@@ -14,9 +12,9 @@ from openpyxl import load_workbook
 
 def get_step(material_name, type):
     if type==1:
-        return int(globals()[material_name].at[0, "wl"])
+        return float(globals()[material_name].iat[0, "wl"])
     elif type==2:
-        return int(globals()[material_name].at[-1, "wl"])
+        return float(globals()[material_name]['wl'].iat[-1])
 @st.cache
 def load_dataset(data_link):
     dataset = pd.read_csv(data_link)
@@ -44,7 +42,7 @@ material=st.sidebar.selectbox(
      (filenames))
 
 if material:
-    st.sidebar.number_input('Длина волны ', min_value=get_step(str(material), 1), max_value=get_step(str(material), 2), step=1)
+    st.sidebar.number_input('Длина волны ', min_value=get_step(str(material), 1), max_value=get_step(str(material), 2))
 
 # # прога ептить пробная попытка запустить файл нахуй.
 # sheet = wb.get_sheet_by_name('Worksheet')
