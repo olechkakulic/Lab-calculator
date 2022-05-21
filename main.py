@@ -1,12 +1,19 @@
 #import time
-#import streamlit as st
 import streamlit as st
 import pandas as pd
-#import numpy as np
+import numpy as npЫ
 #from urllib.request import urlopen
 #import json
 import os
 #from openpyxl import load_workbook
+
+
+#функция для посчитать
+# def count_math()
+# epsilon = n^2
+# k_i_matrix = transpose([epsilon, k_zi])
+# k_zi = (epsilon - k_x)**0.5
+
 
 def get_step(material_name, type):
     if type==1:
@@ -34,27 +41,33 @@ for i in range(len(files)):
         globals()[(files[i][:-4])] = pd.read_csv('DataFiles/'+files[i])
         filenames.append(str(files[i][:-4]))
 
-titanic_link = 'https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv'
-titanic_data = load_dataset(titanic_link)
 #ЗАГОЛОВКИ #
 st.title("Калькулятор Брэгговского зеркала")
 st.markdown("Люблю Дашеньку Салтыкову")
 #код для вводимых данных
-st.sidebar.number_input('Значение угла', min_value = 0, max_value = 180, step = 1)
-st.sidebar.selectbox(
+lol =st.sidebar.number_input('Значение угла', min_value = 0, max_value = 180, step = 1)
+cock = st.sidebar.selectbox(
      'Тип поляризации',
      ('TE', 'TM',))
-material=st.sidebar.selectbox(
-     'Материал',
-     (filenames))
-if material:
-    input_wl=st.sidebar.number_input('Длина волны ', min_value=get_step(str(material), 1), max_value=get_step(str(material), 2))
-# st.sidebar.number_input('n', value = get_koef)
-    if input_wl:
-        st.sidebar.write('n', get_coefficent(str(material),float(input_wl)))
+# material=st.sidebar.selectbox(
+#      'Материал',
+#      (filenames))
+# if material:
+#     input_wl=st.sidebar.number_input('Длина волны ', min_value=get_step(str(material), 1), max_value=get_step(str(material), 2), step=0.001)
+# # st.sidebar.number_input('n', value = get_koef)
+#     if input_wl:
+#         n=st.sidebar.write('n', get_coefficent(str(material),float(input_wl)))
 
+# функция для посчитать
 
+ncol = st.sidebar.number_input("Введите количество слоев",  min_value = 1, step = 1)
+cols = st.sidebar.columns(ncol)
 
-
-
-
+for i in range(ncol):
+    col1 = cols[i%1]
+    a = col1.selectbox(f"Номер слоя # {i}", (filenames), key=i)
+    if a:
+        col2 = cols[i%2]
+        input_wl = col2.number_input(f"Длина волны {i}", min_value=get_step(str(a), 1), max_value=get_step(str(a), 2), step=0.001, key=str(a))
+        if input_wl:
+            n = st.sidebar.write('n', get_coefficent(str(a), float(input_wl)))
