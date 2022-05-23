@@ -1,7 +1,7 @@
 #import time
 import streamlit as st
 import pandas as pd
-import numpy as npЫ
+import numpy as np
 #from urllib.request import urlopen
 #import json
 import os
