@@ -59,15 +59,19 @@ cock = st.sidebar.selectbox(
 #         n=st.sidebar.write('n', get_coefficent(str(material),float(input_wl)))
 
 # функция для посчитать
-
-ncol = st.sidebar.number_input("Введите количество слоев",  min_value = 1, step = 1)
-cols = st.sidebar.columns(ncol)
+container = st.container()
+ncol = st.sidebar.number_input("Введите количество слоев",  min_value = 0, step = 1)
+# cols = container.columns(ncol)
 
 for i in range(ncol):
-    col1 = cols[i%1]
-    a = col1.selectbox(f"Номер слоя # {i}", (filenames), key=i)
+    # col1 = cols[i%1]
+    a = st.sidebar.selectbox(f"Номер слоя # {i+1}", (filenames), key=i)
     if a:
-        col2 = cols[i%2]
-        input_wl = col2.number_input(f"Длина волны {i}", min_value=get_step(str(a), 1), max_value=get_step(str(a), 2), step=0.001, key=str(a))
+        # col2 = cols[i%1]
+        input_wl = st.sidebar.number_input(f"Длина волны {i+1}", min_value=get_step(str(a), 1), max_value=get_step(str(a), 2), step=0.001, key=str(a))
         if input_wl:
-            n = st.sidebar.write('n', get_coefficent(str(a), float(input_wl)))
+            na = get_coefficent(str(a), float(input_wl))
+            n = st.sidebar.write(f':sunglasses: n({i+1}) = {na}')
+
+
+#функция посчитать
