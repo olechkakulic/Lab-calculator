@@ -6,9 +6,8 @@ from numpy import pi, sqrt, cos, arange, sin, exp, array  #
 def get_T_prev(n, nlast, angle, n_prev, n_next):
 
     kx = nlast * sin(angle)
+#должно быть n_0 sin angle, angle = sup
 
-
-#nlast = n(sub)
     def kzi(ni):
         kzi = sqrt(ni ** 2 - kx ** 2)
         return kzi
@@ -46,10 +45,11 @@ def get_T_prev(n, nlast, angle, n_prev, n_next):
 def get_T(i,h, nlast, angle,n, lamb):
     kx = nlast * sin(angle)
 
+    # должно быть n_0 sin angle, angle = sup
     def kzi(ni):
         kzi = sqrt(ni ** 2 - kx ** 2)
         return kzi
-
+#lamb - длина волны
     T=[[0, 0], [0, 0]]
     T[0][0]=exp(2*pi*i*kzi(n)*h/lamb)
     T[0][1]=0
@@ -60,7 +60,7 @@ def get_T(i,h, nlast, angle,n, lamb):
 def get_last_t(i, ni,nlast, ni_prev, ni_next, lambi, hi, angle):
         Ti=get_T_prev(ni,nlast,angle,ni_prev,ni_next).dot(get_T(i,hi,nlast,angle,ni,lambi))
         return Ti
-
+#n_last = n_o,
 n=[0,1,2,3,4,5,6]
 angle=0.345
 wl=[0.1404, 0.1447, 0.1489, 0.1532, 0.1575, 0.1618]
@@ -74,3 +74,4 @@ for i in range (2, len(n)-1):
     T01 = T01.dot(get_T_prev(nl[i], nl[-1], angle, nl[i - 1], nl[i + 1]))
     T01 = T01.dot(get_T(i,h[i],nl[-1],angle,nl[i],wl[i]))
 print(T01)
+#из уравнения n_sub*sin

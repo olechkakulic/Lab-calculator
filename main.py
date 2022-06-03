@@ -45,7 +45,7 @@ for i in range(len(files)):
 st.title("Калькулятор Брэгговского зеркала")
 st.markdown("Люблю Дашеньку Салтыкову")
 #код для вводимых данных
-lol =st.sidebar.number_input('Значение угла', min_value = 0, max_value = 180, step = 1)
+lol =st.sidebar.number_input('Значение угла', min_value = 0, max_value = 90, step = 1)
 cock = st.sidebar.selectbox(
      'Тип поляризации',
      ('TE', 'TM',))
@@ -69,10 +69,10 @@ for i in range(ncol):
     if a:
         # col2 = cols[i%1]
         input_wl = st.sidebar.number_input(f"Длина волны,м {i}", min_value=get_step(str(a), 1), max_value=get_step(str(a), 2), step=0.001, key=str(a))
-        tolshina = st.sidebar.number_input(f"Толщина,м {i}", min_value=0.0, max_value=0.01, step=0.001)
+        tolshina = st.sidebar.number_input(f"Толщина,м {i}", min_value=0.000, max_value=0.010, step=0.001)
         enable_wave_lenght = st.sidebar.checkbox(f'Коэф-т приломления слоя {i} постоянен')
         if input_wl and enable_wave_lenght:
-            n = st.sidebar.write('ТУТ БУДЕТ ЧОТО')
+            n = st.sidebar.number_input('Введите коэффициент преломления', min_value=0.00,max_value=5.00, step=0.01)
         else:
             na = get_coefficent(str(a), float(input_wl))
             n = st.sidebar.write(f':sunglasses: n({i}) = {na}')
