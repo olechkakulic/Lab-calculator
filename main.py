@@ -1,12 +1,13 @@
 #import time
 import streamlit as st
 import pandas as pd
+from numpy import pi
 import numpy as np
 #from urllib.request import urlopen
 #import json
 import os
 #from openpyxl import load_workbook
-
+from plot import calc_TE_pol
 
 #функция для посчитать
 # def count_math()
@@ -46,58 +47,41 @@ st.title("Калькулятор Брэгговского зеркала")
 st.markdown("Люблю Дашеньку Салтыкову")
 #код для вводимых данных
 lol =st.sidebar.number_input('Значение угла', min_value = 0, max_value = 90, step = 1)
+lol=lol*2*pi/360
 cock = st.sidebar.selectbox(
      'Тип поляризации',
      ('TE', 'TM',))
-# material=st.sidebar.selectbox(
-#      'Материал',
-#      (filenames))
-# if material:
-#     input_wl=st.sidebar.number_input('Длина волны ', min_value=get_step(str(material), 1), max_value=get_step(str(material), 2), step=0.001)
-# # st.sidebar.number_input('n', value = get_koef)
-#     if input_wl:
-#         n=st.sidebar.write('n', get_coefficent(str(material),float(input_wl)))
+n_pod =st.sidebar.number_input('Коэф-т преломления подложки', min_value = 0.00, max_value = 3.00, step = 0.01)
+
 
 # функция для посчитать
 container = st.container()
 ncol = st.sidebar.number_input("Введите количество слоев",  min_value = 0, step = 1)
 # cols = container.columns(ncol)
+nal=[]
+wl=[]
+h=[]
+
 
 for i in range(ncol):
-    # col1 = cols[i%1]
     a = st.sidebar.selectbox(f"Номер слоя # {i}", (filenames), key=i)
     if a:
-        # col2 = cols[i%1]
-        input_wl = st.sidebar.number_input(f"Длина волны,м {i}", min_value=get_step(str(a), 1), max_value=get_step(str(a), 2), step=0.001, key=str(a))
-        tolshina = st.sidebar.number_input(f"Толщина,м {i}", min_value=0.000, max_value=0.010, step=0.001)
+        input_wl = st.sidebar.number_input(f"Длина волны,м {i}", min_value=get_step(str(a), 1), max_value=get_step(str(a), 2), step=0.01, key=str(a))
+        wl.append(input_wl)
+        tolshina = st.sidebar.number_input(f"Толщина,м {i}", min_value=0.000, max_value=0.010, step=0.001, format="%f")
+        h.append(tolshina)
         enable_wave_lenght = st.sidebar.checkbox(f'Коэф-т приломления слоя {i} постоянен')
         if input_wl and enable_wave_lenght:
             n = st.sidebar.number_input('Введите коэффициент преломления', min_value=0.00,max_value=5.00, step=0.01)
+            nal.append(n)
         else:
             na = get_coefficent(str(a), float(input_wl))
-            n = st.sidebar.write(f':sunglasses: n({i}) = {na}')
-
-
-#функция посчитать
-# materials = {'ag':,
-# 'ar':,
-# 'au':,
-# 'be':,
-# 'bi':,
-# 'ca':,
-# 'ce':,
-# 'co':,
-# 'cr':,
-# 'cs':,
-# 'cu':,
-# 'er':,
-# 'eu':,
-# 'he':,
-# 'hf':,
-# 'hg':,
-# 'ho':,
-# 'in':,
-# 'ir':,
-# 'k':,
-# 'kr':,
-#
+            n = st.sidebar.write(f' n({i}) = {na}')
+            nal.append(na)
+st.write(lol,ncol, nal, wl,h)
+if st.button('ЗАМЕСИТЬ ГЛИНУ'):
+    if ncol<=3:
+        BOba=1
+    else:
+        BOba = calc_TE_pol(ncol, nal, lol, h, wl, n_pod)
+    st.write(BOba)
