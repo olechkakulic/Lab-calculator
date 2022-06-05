@@ -3,7 +3,9 @@ import numpy
 from numpy import pi, sqrt, cos, arange, sin, exp, array, absolute  #
 #нулевой слой - воздух, n+1 - подложка, самый нижний слой, угол на вход - угол sup
 #угол выхода - n+1 слой sub
-def calc_TE_pol(n, nl, angle, h, wl, n_pod):
+def calc_TE_pol(n, nl, angle, h, wl, n_pod, n_air):
+    global T01
+
     def get_T_prev(n, n0, angle, n_prev, n_next):
 
         kx = n0 * sin(angle)
@@ -58,13 +60,17 @@ def calc_TE_pol(n, nl, angle, h, wl, n_pod):
         T[1][1]=exp((-1)*2*pi*(0+1j)*kzi(n)*h/lamb)
         return array(T)
 
-
-    T01=get_T_prev(nl[1],nl[0],angle,nl[0],nl[2])
-    T01=T01.dot(get_T(h[1],nl[0],angle,nl[1],wl[1]))
-    for i in range (2, n-1):
-        T01 = T01.dot(get_T_prev(nl[i], nl[0], angle, nl[i - 1], nl[i + 1]))
-        T01 = T01.dot(get_T(h[i],nl[0],angle,nl[i],wl[i]))
-    #T01 = T01.dot(get_T_prev(nl[-1], nl[0], angle, nl[-2], n_pod))
+    if n==0:
+        T01=get_T_prev(nl[0], n_air, angle, n_air, n_pod)
+        T01=T01.dot(get_T(h[0],n_air,angle,nl[0],wl[0]))
+        T01=T01.dot(get_T_prev(n_pod,n_air,angle,nl[0],n_pod))
+    else:
+        T01=get_T_prev(nl[0],n_air,angle,n_air,nl[1])
+        T01=T01.dot(get_T(h[0],n_air,angle,nl[0],wl[0]))
+        for i in range (1, n):
+            T01 = T01.dot(get_T_prev(nl[i], n_air, angle, nl[i - 1], nl[i + 1]))
+            T01 = T01.dot(get_T(h[i],n_air,angle,nl[i],wl[i]))
+        T01 = T01.dot(get_T_prev(nl[-1], n_air, angle, nl[-2], n_pod))
     tau0N=1/T01[1][1]
     r00=-T01[1][0]/T01[1][1]
     rnn=T01[0][1]/T01[1][1]
