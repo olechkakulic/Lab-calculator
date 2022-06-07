@@ -79,7 +79,7 @@ for i in range(ncol):
             na = get_coefficent(str(a), float(input_wl))
             n = st.sidebar.write(f' n({i}) = {na}')
             nal.append(na)
-if st.button('Люблю сему') and cock=='TE' and ncol>0:
+if st.button('хочу убить себя') and cock=='TE' and ncol>0:
     BOba = calc_TE_pol(ncol-1, nal, lol, h, input_wl, n_pod, n_air)
     st.write(BOba)
     angles=[]
