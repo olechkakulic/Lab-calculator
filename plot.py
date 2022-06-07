@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy
-from numpy import pi, sqrt, cos, arange, sin, exp, array, absolute  #
+from numpy import pi, sqrt, cos, arange, sin, exp, array, absolute, real  #
 #нулевой слой - воздух, n+1 - подложка, самый нижний слой, угол на вход - угол sup
 #угол выхода - n+1 слой sub
 def calc_TE_pol(n, nl, angle, h, wl, n_pod, n_air):
@@ -62,14 +62,14 @@ def calc_TE_pol(n, nl, angle, h, wl, n_pod, n_air):
 
     if n==0:
         T01=get_T_prev(nl[0], n_air, angle, n_air, n_pod)
-        T01=T01.dot(get_T(h[0],n_air,angle,nl[0],wl[0]))
+        T01=T01.dot(get_T(h[0],n_air,angle,nl[0],wl))
         T01=T01.dot(get_T_prev(n_pod,n_air,angle,nl[0],n_pod))
     else:
         T01=get_T_prev(nl[0],n_air,angle,n_air,nl[1])
-        T01=T01.dot(get_T(h[0],n_air,angle,nl[0],wl[0]))
+        T01=T01.dot(get_T(h[0],n_air,angle,nl[0],wl))
         for i in range (1, n):
             T01 = T01.dot(get_T_prev(nl[i], n_air, angle, nl[i - 1], nl[i + 1]))
-            T01 = T01.dot(get_T(h[i],n_air,angle,nl[i],wl[i]))
+            T01 = T01.dot(get_T(h[i],n_air,angle,nl[i],wl))
         T01 = T01.dot(get_T_prev(nl[-1], n_air, angle, nl[-2], n_pod))
     tau0N=1/T01[1][1]
     r00=-T01[1][0]/T01[1][1]
@@ -77,4 +77,8 @@ def calc_TE_pol(n, nl, angle, h, wl, n_pod, n_air):
     tauN_0=T01[0][0]+(r00*rnn)/tau0N
     R00=absolute(r00)**2
     RNN=absolute(rnn)**2
-    return R00, RNN
+    kz0=numpy.sqrt(n_air**2 - (n_air*sin(angle))**2)
+    kzN1=numpy.sqrt(n_pod**2 - (n_air*sin(angle))**2)
+    TBIG_0N=(absolute(tau0N)**2)*real(kz0/kzN1)
+    TBIG_N0=(absolute(tauN_0)**2)*real(kzN1/kz0)
+    return R00, RNN, TBIG_0N, TBIG_N0
