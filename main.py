@@ -1,23 +1,10 @@
-# import time
-import numpy
 import streamlit as st
 import pandas as pd
-from numpy import pi
-import numpy as np
 from count import *
-# from urllib.request import urlopen
-# import json
 import os
-# from openpyxl import load_workbook
 from count import calc_TE_pol
 from bokeh.plotting import figure
 
-
-# def get_step(material_name, types):
-#     if types == 1:
-#         return float(globals()[material_name]['wl'].values[0])
-#     elif types == 2:
-#         return float(globals()[material_name]['wl'].values[-1])
 
 def get_coefficent(mat, inp_wl):
     wl_list = globals()[mat]['wl'].tolist()  # работаем с переменной global добавляем столбец wl в список
@@ -63,15 +50,14 @@ for i in range(len(files)):
 
 # ЗАГОЛОВКИ
 st.title("Калькулятор Брэгговского зеркала")
-st.markdown("Люблю Дашеньку Салтыкову")
 # код для вводимых данных
-angle_input = st.sidebar.number_input('Значение угла', min_value=0, max_value=90, step=1)
+angle_input = st.sidebar.number_input('Значение угла', min_value=0, max_value=90, step=5)
 angle_input = angle_input * 2 * pi / 360
 polarisation = st.sidebar.selectbox(
     'Тип поляризации',
     ('TE', 'TM',))
 n_pod = 1.00
-n_air = st.sidebar.number_input('Коэф-т преломления подложки', min_value=1.00, max_value=4.00, step=0.1)
+n_air = st.sidebar.number_input('Коэф-т преломления 0 слоя', min_value=1.00, max_value=4.00, step=0.1)
 input_wl = st.sidebar.number_input(f"Длина волны,мкм", min_value=0.4, max_value=0.8, step=0.05)
 container = st.container()
 ncol = st.sidebar.number_input("Введите количество слоев", min_value=0, step=1)
@@ -80,11 +66,11 @@ h = []
 layers_name = []
 
 for i in range(ncol):
-    a = st.sidebar.selectbox(f"Номер слоя # {i + 1}", (filenames), key=i)
+    a = st.sidebar.selectbox(f"Материал слоя # {i + 1}", (filenames), key=i)
     layers_name.append(a)
     if a:
-        tolshina = st.sidebar.number_input(f"Толщина,нм {i + 1} слоя", min_value=0, max_value=800, step=10)
-        h.append(tolshina * 10 ** (-9))
+        tolсhina = st.sidebar.number_input(f"Толщина {i + 1} слоя,мкм", min_value=0.03, max_value=0.4, step=0.01)
+        h.append(tolсhina * 10 ** (-6))
         enable_wave_lenght = st.sidebar.checkbox(f'Коэф-т преломления слоя {i + 1} постоянен')
         if enable_wave_lenght:
             n = st.sidebar.number_input(f'Введите коэффициент преломления {i + 1} слоя', min_value=0.001,
@@ -96,9 +82,10 @@ for i in range(ncol):
             n = st.sidebar.write(f' n({i + 1}) = {na}')
             nal.append(na)
             #nal.append(f"{na:.2}")
-if st.button('хочу убить себя') and ncol > 0:
-    BOba = calc_TE_pol(ncol - 1, nal, angle_input, h, input_wl, n_pod, n_air, str(polarisation))
-    st.write(BOba)
+if st.button('Рассчитать') and ncol > 0:
+    r_coef, t_coef = calc_TE_pol(ncol - 1, nal, angle_input, h, input_wl, n_pod, n_air, str(polarisation))
+    Result = f"Коэффициент отражения: {r_coef}",f" Коэффициент пропускания: {t_coef}"
+    st.info(Result)
     angles = []
     # powers00=[]
     powersnn = []
@@ -108,8 +95,8 @@ if st.button('хочу убить себя') and ncol > 0:
         i = i * 2 * pi / 360
         angles.append(i)
         # powers00.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air)[0])
-        powersnn.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[1])
-        T_N0_angle.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[3])
+        powersnn.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[0])
+        T_N0_angle.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[1])
     # fig1=figure(
     #     title='R00(angle)',
     #     x_axis_label='angle, grad',
@@ -139,11 +126,11 @@ if st.button('хочу убить себя') and ncol > 0:
     wawes = []
     for waw in numpy.arange(0.4, 0.8, 0.05):
         wawes.append(waw)
-        p = calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[1]
+        p = calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[0]
         powersnn_wave.append(p)
         print(p)
         T_N0_wave.append(
-            calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[3])
+            calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[1])
 
     st.write(powersnn_wave, T_N0_wave)
     fig3 = figure(

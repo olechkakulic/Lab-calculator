@@ -27,7 +27,7 @@ def calc_TE_pol(n, nl, angle, h, wl, n_pod, n_air, polarisation):
 
             r_prev = (Ei(n) * kzi(n_prev) - Ei(n_prev) * kzi(n)) / (Ei(n) * kzi(n_prev) + Ei(n_prev) * kzi(n))
             r = (Ei(n_next) * kzi(n) - Ei(n) * kzi(n_next)) / (Ei(n_next) * kzi(n) + Ei(n) * kzi(n_next))
-            t = 2 * Ei(n) * kzi(n_prev) / Ei(n) * (kzi(n_prev) + Ei(n_prev) * kzi(n))
+            t = 2 * Ei(n) * kzi(n_prev) /( Ei(n) * kzi(n_prev) + Ei(n_prev) * kzi(n))
             t_prev = 2 * Ei(n_next) * kzi(n) / (Ei(n_next) * kzi(n) + Ei(n) * kzi(n_next))
 
         Tprev = [[0, 0], [0, 0]]
@@ -69,17 +69,19 @@ def calc_TE_pol(n, nl, angle, h, wl, n_pod, n_air, polarisation):
     rnn = T01[0][1] / T01[1][1]
     tauN_0 = T01[0][0] + (r00 * rnn) / tau0N  # луч идет снизу
     # POWER REFLECTION
-    R00 = absolute(r00) ** 2
-    RNN = absolute(rnn) ** 2
+    #R00 = absolute(r00) ** 2
+    #RNN = absolute(rnn) ** 2
     # POWER TRANSMISSION FOR TE:
     kz0 = numpy.sqrt(n_air ** 2 - (n_pod * sin(angle)) ** 2)
     kzN1 = numpy.sqrt(n_pod ** 2 - (n_pod * sin(angle)) ** 2)
     if polarisation == 'TE':
-        TBIG_0N = (absolute(tau0N) ** 2) * real(kz0 / kzN1)
+        #TBIG_0N = (absolute(tau0N) ** 2) * real(kz0 / kzN1)
         TBIG_N0 = (absolute(tauN_0) ** 2) * real(kzN1 / kz0)
+        RNN = 1 - TBIG_N0
     elif polarisation == 'TM':
         E_0 = n_air ** 2
         E_N = n_pod ** 2
-        TBIG_0N = (absolute(tau0N) ** 2) * real((kz0 * E_N) / (kzN1 * E_0))
+        #TBIG_0N = (absolute(tau0N) ** 2) * real((kz0 * E_N) / (kzN1 * E_0))
         TBIG_N0 = (absolute(tauN_0) ** 2) * real((kzN1 * E_0) / (kz0 * E_N))
-    return R00, RNN, TBIG_0N, TBIG_N0
+        RNN = 1 - TBIG_N0
+    return RNN, TBIG_N0
