@@ -5,7 +5,7 @@ import os
 from count import calc_TE_pol
 from bokeh.plotting import figure
 def interpol(mat, wl):
-    with open('DataFiles/' + mat + '.csv', 'r') as f:
+    with open('Materilas/' + mat + '.csv', 'r') as f:
         lines = f.readlines()
         for i in range(2, len(lines)):
             line_prev = list(map(float, lines[i-1].split(',')))
@@ -23,7 +23,7 @@ def update_n(a, inp_wl):
 def load_dataset(data_link):
     dataset = pd.read_csv(data_link)
     return dataset
-directory = 'DataFiles'
+directory = 'Materilas'
 files = os.listdir(directory)
 filenames = []
 for i in range(len(files)):
