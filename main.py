@@ -4,28 +4,22 @@ from count import *
 import os
 from count import calc_TE_pol
 from bokeh.plotting import figure
-
-
-
 def interpol(mat, wl):
     with open('DataFiles/' + mat + '.csv', 'r') as f:
         lines = f.readlines()
         for i in range(2, len(lines)):
-            line_prev = lines[i - 1].split(',')
-            line_cur = lines[i].split(',')
+            line_prev = list(map(float, lines[i-1].split(',')))
+            line_cur = list(map(float, lines[i].split(',')))
             if float(line_prev[0]) <= wl <= float(line_cur[0]):
-                return (float(line_cur[1]) - float(line_prev[1])) / (float(line_cur[0]) - float(line_prev[0])) * (
-                            wl - float(line_prev[0])) + float(line_prev[1])
+                return (line_cur[1] - line_prev[1]) / (line_cur[0] - line_prev[0]) * (
+                            wl - line_prev[0]) + line_prev[1]
     return 1
-
 
 def update_n(a, inp_wl):
     n = []
     for mat in a:
-        # n.append(get_coefficent(str(mat), float(inp_wl)))
         n.append(interpol(str(mat), float(inp_wl)))
     return n
-
 
 # работа с файлами
 @st.cache
@@ -43,7 +37,7 @@ for i in range(len(files)):
 # ЗАГОЛОВКИ
 st.title("Калькулятор Брэгговского зеркала")
 # код для вводимых данных
-angle_input = st.sidebar.number_input('Значение угла', min_value=0, max_value=90, step=5)
+angle_input = st.sidebar.number_input('Значение угла', min_value=0, max_value=85, step=5)
 angle_input = angle_input * 2 * pi / 360
 polarisation = st.sidebar.selectbox(
     'Тип поляризации',
@@ -76,7 +70,7 @@ for i in range(ncol):
             #nal.append(f"{na:.2}")
 if st.button('Рассчитать') and ncol > 0:
     r_coef1, t_coef1 = calc_TE_pol(ncol - 1, nal, angle_input, h, input_wl, n_pod, n_air, str(polarisation))
-    Result = f"Коэффициент отражения: {r_coef1}",f" Коэффициент пропускания: {t_coef1}"
+    Result = f"Коэффициент отражения: {round(r_coef1,4)}",f" Коэффициент пропускания: {round(t_coef1,4)}"
     st.info(Result)
     angles = []
     # powers00=[]
@@ -89,29 +83,27 @@ if st.button('Рассчитать') and ncol > 0:
         # powers00.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air)[0])
         powersnn.append(round(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[0], 3))
         T_N0_angle.append(round(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[1], 3))
-    # fig1=figure(
-    #     title='R00(angle)',
-    #     x_axis_label='angle, grad',
-    #     y_axis_label='R00'
-    # )
-    # fig1.line(angles, powers00, legend_label='Olya1', line_width=2)
-    # st.bokeh_chart(fig1, use_container_width=True)
-
-    fig2 = figure(
-        title='RNN(angle)',
-        x_axis_label='angle, grad',
-        y_axis_label='Power reflection'
+    c1, c2 = st.columns(2)
+    with c1:
+        fig1 = figure(
+            width=800,
+            height=400,
+            title='Power reflection(angle)',
+            x_axis_label='angle, rad',
+            y_axis_label='Power reflection'
     )
-    fig2.line(angles, powersnn, line_width=2)
-    st.bokeh_chart(fig2, use_container_width=True)
-
-    fig3 = figure(
-        title='TNN(angle)',
-        x_axis_label='angle, rad',
-        y_axis_label='Transmission coefficient'
-    )
-    fig3.line(angles, T_N0_angle, line_width=2)
-    st.bokeh_chart(fig3, use_container_width=True)
+        fig1.line(angles, powersnn, line_width=2)
+        st.bokeh_chart(fig1, use_container_width=True)
+    with c2:
+        fig2 = figure(
+            width=800,
+            height=400,
+            title='Transmission coefficient(angle)',
+            x_axis_label='angle, rad',
+            y_axis_label='Transmission coefficient'
+        )
+        fig2.line(angles, T_N0_angle, line_width=2)
+        st.bokeh_chart(fig2, use_container_width=True)
 
     powersnn_wave = []
     T_N0_wave = []
@@ -126,7 +118,7 @@ if st.button('Рассчитать') and ncol > 0:
         elif p>=1:
             powersnn_wave.append(1)
         #powersnn_wave.append(round(p, 5))
-        print(p)
+        #print(p)
         s=calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[1]
         if s <= 0:
             T_N0_wave.append(0)
@@ -135,21 +127,27 @@ if st.button('Рассчитать') and ncol > 0:
         elif s >= 1:
             T_N0_wave.append(1)
             # powersnn_wave.append(round(p, 5))
-        print(s)
+        #print(s)
 
-    st.write(powersnn_wave, T_N0_wave)
-    fig3 = figure(
-        title='RNN(wave)',
-        x_axis_label='wave, µm',
-        y_axis_label='RNN'
+    #st.write(powersnn_wave, T_N0_wave)
+    c3, c4 = st.columns(2)
+    with c3:
+        fig3 = figure(
+            width=800,
+            height=400,
+            title='Power reflection(wave)',
+            x_axis_label='wave, µm',
+            y_axis_label='Power reflection'
     )
-    fig3.line(wawes, powersnn_wave, line_width=2)
-    st.bokeh_chart(fig3, use_container_width=True)
-
-    fig4 = figure(
-        title='TNN(wave)',
-        x_axis_label='wave, нм',
-        y_axis_label='TNN'
+        fig3.line(wawes, powersnn_wave, line_width=2)
+        st.bokeh_chart(fig3, use_container_width=True)
+    with c4:
+        fig4 = figure(
+            width=800,
+            height=400,
+            title='Transmission coefficient(wave)',
+            x_axis_label='wave, µm',
+            y_axis_label='Transmission coefficient'
     )
-    fig4.line(wawes, T_N0_wave, line_width=2)
-    st.bokeh_chart(fig4, use_container_width=True)
+        fig4.line(wawes, T_N0_wave, line_width=2)
+        st.bokeh_chart(fig4, use_container_width=True)
