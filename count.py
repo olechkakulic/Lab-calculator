@@ -4,7 +4,7 @@ from numpy import pi, sqrt, cos, arange, sin, exp, array, absolute, real  #
 
 
 def calc_TE_pol(n, nl, angle, h, wl, n_pod, n_air, polarisation):
-    global T01
+    global T01, TBIG_0N, TBIG_N0
 
     def get_T_prev(n, n_pod, angle, n_prev, n_next):
         global r_prev, t_prev, t, r

@@ -27,10 +27,23 @@ def get_coefficent(mat, inp_wl):
     return float(globals()[mat]['n'].values[number])  # выводим значение n ки для этого номера
 
 
+def interpol(mat, wl):
+    with open('DataFiles/' + mat + '.csv', 'r') as f:
+        lines = f.readlines()
+        for i in range(2, len(lines)):
+            line_prev = lines[i - 1].split(',')
+            line_cur = lines[i].split(',')
+            if float(line_prev[0]) <= wl <= float(line_cur[0]):
+                return (float(line_cur[1]) - float(line_prev[1])) / (float(line_cur[0]) - float(line_prev[0])) * (
+                            wl - float(line_prev[0])) + float(line_prev[1])
+    return 1
+
+
 def update_n(a, inp_wl):
     n = []
     for mat in a:
-        n.append(get_coefficent(str(mat), float(inp_wl)))
+        # n.append(get_coefficent(str(mat), float(inp_wl)))
+        n.append(interpol(str(mat), float(inp_wl)))
     return n
 
 
@@ -59,7 +72,7 @@ polarisation = st.sidebar.selectbox(
     ('TE', 'TM',))
 n_pod = 1.00
 n_air = st.sidebar.number_input('Коэф-т преломления подложки', min_value=1.00, max_value=4.00, step=0.1)
-input_wl = st.sidebar.number_input(f"Длина волны,мкм", min_value=0.4, max_value=1.5, step=0.05)
+input_wl = st.sidebar.number_input(f"Длина волны,мкм", min_value=0.4, max_value=0.8, step=0.05)
 container = st.container()
 ncol = st.sidebar.number_input("Введите количество слоев", min_value=0, step=1)
 nal = []
@@ -72,15 +85,17 @@ for i in range(ncol):
     if a:
         tolshina = st.sidebar.number_input(f"Толщина,нм {i + 1} слоя", min_value=0, max_value=800, step=10)
         h.append(tolshina * 10 ** (-9))
-        enable_wave_lenght = st.sidebar.checkbox(f'Коэф-т приломления слоя {i + 1} постоянен')
+        enable_wave_lenght = st.sidebar.checkbox(f'Коэф-т преломления слоя {i + 1} постоянен')
         if enable_wave_lenght:
             n = st.sidebar.number_input(f'Введите коэффициент преломления {i + 1} слоя', min_value=0.001,
                                         max_value=5.00, step=0.01)
             nal.append(n)
         else:
-            na = get_coefficent(str(a), float(input_wl))
+            # na = get_coefficent(str(a), float(input_wl))
+            na = interpol(str(a), float(input_wl))
             n = st.sidebar.write(f' n({i + 1}) = {na}')
             nal.append(na)
+            #nal.append(f"{na:.2}")
 if st.button('хочу убить себя') and ncol > 0:
     BOba = calc_TE_pol(ncol - 1, nal, angle_input, h, input_wl, n_pod, n_air, str(polarisation))
     st.write(BOba)
