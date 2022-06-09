@@ -57,7 +57,7 @@ polarisation = st.sidebar.selectbox(
     'Тип поляризации',
     ('TE', 'TM',))
 n_pod = 1.00
-n_air = st.sidebar.number_input('Коэф-т преломления 0 слоя', min_value=1.00, max_value=4.00, step=0.1)
+n_air = 1.00
 input_wl = st.sidebar.number_input(f"Длина волны,мкм", min_value=0.4, max_value=0.8, step=0.05)
 container = st.container()
 ncol = st.sidebar.number_input("Введите количество слоев", min_value=0, step=1)
@@ -83,8 +83,8 @@ for i in range(ncol):
             nal.append(na)
             #nal.append(f"{na:.2}")
 if st.button('Рассчитать') and ncol > 0:
-    r_coef, t_coef = calc_TE_pol(ncol - 1, nal, angle_input, h, input_wl, n_pod, n_air, str(polarisation))
-    Result = f"Коэффициент отражения: {r_coef}",f" Коэффициент пропускания: {t_coef}"
+    r_coef2, t_coef2 = calc_TE_pol(ncol - 1, nal, angle_input, h, input_wl, n_pod, n_air, str(polarisation))
+    Result = f"Коэффициент отражения: {r_coef2}",f" Коэффициент пропускания: {t_coef2}"
     st.info(Result)
     angles = []
     # powers00=[]
@@ -95,8 +95,8 @@ if st.button('Рассчитать') and ncol > 0:
         i = i * 2 * pi / 360
         angles.append(i)
         # powers00.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air)[0])
-        powersnn.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[0])
-        T_N0_angle.append(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[1])
+        powersnn.append(round(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[0], 3))
+        T_N0_angle.append(round(calc_TE_pol(ncol - 1, nal, i, h, input_wl, n_pod, n_air, str(polarisation))[1], 3))
     # fig1=figure(
     #     title='R00(angle)',
     #     x_axis_label='angle, grad',
@@ -108,26 +108,26 @@ if st.button('Рассчитать') and ncol > 0:
     fig2 = figure(
         title='RNN(angle)',
         x_axis_label='angle, grad',
-        y_axis_label='RNN'
+        y_axis_label='Power reflection'
     )
-    fig2.line(angles, powersnn, legend_label='Olya2', line_width=2)
+    fig2.line(angles, powersnn, line_width=2)
     st.bokeh_chart(fig2, use_container_width=True)
 
     fig3 = figure(
         title='TNN(angle)',
-        x_axis_label='angle, grad',
-        y_axis_label='TNN'
+        x_axis_label='angle, rad',
+        y_axis_label='Transmission coefficient'
     )
-    fig3.line(angles, T_N0_angle, legend_label='Olya22', line_width=2)
+    fig3.line(angles, T_N0_angle, line_width=2)
     st.bokeh_chart(fig3, use_container_width=True)
 
     powersnn_wave = []
     T_N0_wave = []
     wawes = []
-    for waw in numpy.arange(0.4, 0.8, 0.05):
+    for waw in numpy.arange(0.4, 0.8, 0.001):
         wawes.append(waw)
         p = calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[0]
-        powersnn_wave.append(p)
+        powersnn_wave.append(round(p, 5))
         print(p)
         T_N0_wave.append(
             calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[1])
@@ -135,10 +135,10 @@ if st.button('Рассчитать') and ncol > 0:
     st.write(powersnn_wave, T_N0_wave)
     fig3 = figure(
         title='RNN(wave)',
-        x_axis_label='wave, нм',
+        x_axis_label='wave, µm',
         y_axis_label='RNN'
     )
-    fig3.line(wawes, powersnn_wave, legend_label='Olya33', line_width=2)
+    fig3.line(wawes, powersnn_wave, line_width=2)
     st.bokeh_chart(fig3, use_container_width=True)
 
     fig4 = figure(
@@ -146,5 +146,5 @@ if st.button('Рассчитать') and ncol > 0:
         x_axis_label='wave, нм',
         y_axis_label='TNN'
     )
-    fig4.line(wawes, T_N0_wave, legend_label='Olya44', line_width=2)
+    fig4.line(wawes, T_N0_wave, line_width=2)
     st.bokeh_chart(fig4, use_container_width=True)
