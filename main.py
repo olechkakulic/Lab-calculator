@@ -6,13 +6,6 @@ from count import calc_TE_pol
 from bokeh.plotting import figure
 
 
-def get_coefficent(mat, inp_wl):
-    wl_list = globals()[mat]['wl'].tolist()  # работаем с переменной global добавляем столбец wl в список
-    nearest_wl = min(wl_list, key=lambda x: abs(
-        x - inp_wl))  # берем ближайшее к вводимой длине, по значениям которой сортируются элементы массива.
-    number = wl_list.index(nearest_wl)  # присваиваем индекс от ближ волны переменной wl list
-    return float(globals()[mat]['n'].values[number])  # выводим значение n ки для этого номера
-
 
 def interpol(mat, wl):
     with open('DataFiles/' + mat + '.csv', 'r') as f:
@@ -45,7 +38,6 @@ directory = 'DataFiles'
 files = os.listdir(directory)
 filenames = []
 for i in range(len(files)):
-    globals()[(files[i][:-4])] = pd.read_csv('DataFiles/' + files[i])
     filenames.append(str(files[i][:-4]))
 
 # ЗАГОЛОВКИ
@@ -83,8 +75,8 @@ for i in range(ncol):
             nal.append(na)
             #nal.append(f"{na:.2}")
 if st.button('Рассчитать') and ncol > 0:
-    r_coef2, t_coef2 = calc_TE_pol(ncol - 1, nal, angle_input, h, input_wl, n_pod, n_air, str(polarisation))
-    Result = f"Коэффициент отражения: {r_coef2}",f" Коэффициент пропускания: {t_coef2}"
+    r_coef1, t_coef1 = calc_TE_pol(ncol - 1, nal, angle_input, h, input_wl, n_pod, n_air, str(polarisation))
+    Result = f"Коэффициент отражения: {r_coef1}",f" Коэффициент пропускания: {t_coef1}"
     st.info(Result)
     angles = []
     # powers00=[]
@@ -127,10 +119,23 @@ if st.button('Рассчитать') and ncol > 0:
     for waw in numpy.arange(0.4, 0.8, 0.001):
         wawes.append(waw)
         p = calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[0]
-        powersnn_wave.append(round(p, 5))
+        if p<=0:
+            powersnn_wave.append(0)
+        elif p>0 and p<1:
+            powersnn_wave.append(round(p, 5))
+        elif p>=1:
+            powersnn_wave.append(1)
+        #powersnn_wave.append(round(p, 5))
         print(p)
-        T_N0_wave.append(
-            calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[1])
+        s=calc_TE_pol(ncol - 1, update_n(layers_name, waw), angle_input, h, waw, n_pod, n_air, str(polarisation))[1]
+        if s <= 0:
+            T_N0_wave.append(0)
+        elif s > 0 and s < 1:
+            T_N0_wave.append(round(s, 5))
+        elif s >= 1:
+            T_N0_wave.append(1)
+            # powersnn_wave.append(round(p, 5))
+        print(s)
 
     st.write(powersnn_wave, T_N0_wave)
     fig3 = figure(

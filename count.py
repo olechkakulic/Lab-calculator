@@ -77,11 +77,11 @@ def calc_TE_pol(n, nl, angle, h, wl, n_pod, n_air, polarisation):
     if polarisation == 'TE':
         TBIG_0N = (absolute(tau0N) ** 2) * real(kz0 / kzN1)
         TBIG_N0 = (absolute(tauN_0) ** 2) * real(kzN1 / kz0)
-        R00 = 1 - TBIG_0N
+        RNN = 1 - TBIG_N0
     elif polarisation == 'TM':
         E_0 = n_air ** 2
         E_N = n_pod ** 2
         TBIG_0N = (absolute(tau0N) ** 2) * real((kz0 * E_N) / (kzN1 * E_0))
         TBIG_N0 = (absolute(tauN_0) ** 2) * real((kzN1 * E_0) / (kz0 * E_N))
-        R00 = 1 - TBIG_0N
-    return R00, TBIG_0N
+        RNN = 1 - TBIG_N0
+    return RNN, TBIG_N0
